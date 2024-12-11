@@ -11,7 +11,6 @@ import reactor.core.publisher.Mono;
 public class DynamoDBEvent_Controller {
     @PostMapping
     public Mono<Void> handleInserts(@RequestBody DynamoDB_Event event) {
-        // Print the received message from the DynamoDB stream
         System.out.println("Received DynamoDB Event: " + event.getMessage());
         return Mono.empty();
     }
