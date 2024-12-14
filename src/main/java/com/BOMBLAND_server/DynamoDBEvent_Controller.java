@@ -1,16 +1,17 @@
 package com.BOMBLAND_server;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 @RestController
 public class DynamoDBEvent_Controller {
     @PostMapping("/database-changes")
-    public Mono<Void> handleInserts(@RequestBody DynamoDB_Event event) {
-        System.out.println("Received DynamoDB Event: " + event.getMessage());
-        return Mono.empty();
+    public ResponseEntity<String> handleInserts(@RequestBody String event) {
+//        System.out.println("Received DynamoDB Event: " + event.getMessage());
+        System.out.println("Received DynamoDB Event: " + event);
+        return ResponseEntity.ok("Request processed successfully!");
     }
 }
 
