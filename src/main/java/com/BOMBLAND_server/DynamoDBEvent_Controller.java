@@ -14,10 +14,10 @@ public class DynamoDBEvent_Controller {
 //        System.out.println("newHighScore.score = " + newHighScore.getScore());
 //        System.out.println("newHighScore.name = " + newHighScore.getName());
 
-        System.out.println("vvvvvvvvvvvvvvvvvvvvvvvv");
-        System.out.println("WebFlux Sever");
-        System.out.println("newHighScore :" + newHighScore);
-        System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^");
+        System.out.println("Line 1");
+        System.out.println("Line 2");
+        System.out.println("Line 3");
+        System.out.println("Line 4");
 
         return ResponseEntity.ok("Request processed successfully!");
     }
