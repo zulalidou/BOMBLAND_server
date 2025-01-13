@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class DynamoDBEvent_Controller {
     @PostMapping("/database-changes")
     public ResponseEntity<String> handleInserts(@RequestBody HighScore newHighScore) {
-        System.out.println("\nnewHighScore: " + newHighScore);
         System.out.println("newHighScore.id = " + newHighScore.getID());
         System.out.println("newHighScore.score = " + newHighScore.getScore());
         System.out.println("newHighScore.name = " + newHighScore.getName());
