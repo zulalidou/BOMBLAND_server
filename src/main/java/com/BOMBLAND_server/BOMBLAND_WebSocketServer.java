@@ -17,6 +17,10 @@ public class BOMBLAND_WebSocketServer extends WebSocketServer {
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
+        System.out.println("onOpen()");
+        System.out.println("conn: " + conn);
+        System.out.println("handshake: " + handshake);
+
         // Add the new client connection to the list
         clients.add(conn);
         System.out.println("New client connected: " + conn.getRemoteSocketAddress());
@@ -24,6 +28,11 @@ public class BOMBLAND_WebSocketServer extends WebSocketServer {
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
+        System.out.println("onClose()");
+        System.out.println("conn: " + conn);
+        System.out.println("code: " + code);
+        System.out.println("reason: " + reason);
+
         // Remove the client from the list when it disconnects
         clients.remove(conn);
         System.out.println("Client disconnected: " + conn.getRemoteSocketAddress());
@@ -31,7 +40,9 @@ public class BOMBLAND_WebSocketServer extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conn, String message) {
-        System.out.println("Received message: " + message);
+        System.out.println("onMessage()");
+        System.out.println("conn: " + conn);
+        System.out.println("message: " + message);
 
         // When a new high score is received, broadcast it to all other clients
         broadcastNewHighScore(message, conn);
@@ -39,11 +50,19 @@ public class BOMBLAND_WebSocketServer extends WebSocketServer {
 
     @Override
     public void onError(WebSocket conn, Exception ex) {
+        System.out.println("onError()");
+        System.out.println("==============");
+        System.out.println(ex.getCause());
+        System.out.println("--------------");
+        System.out.println(ex.getMessage());
+        System.out.println("--------------");
         ex.printStackTrace();
+        System.out.println("==============");
     }
 
     @Override
     public void onStart() {
+        System.out.println("onStart()");
         System.out.println("WebSocket server started successfully.");
     }
 
