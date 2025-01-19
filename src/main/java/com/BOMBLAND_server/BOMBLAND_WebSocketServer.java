@@ -17,13 +17,35 @@ public class BOMBLAND_WebSocketServer extends WebSocketServer {
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
+        String path = handshake.getResourceDescriptor();
+
         System.out.println("onOpen()");
         System.out.println("conn: " + conn);
         System.out.println("handshake: " + handshake);
+        System.out.println("path: " + path + "\n\n");
 
-        // Add the new client connection to the list
-        clients.add(conn);
-        System.out.println("New client connected: " + conn.getRemoteSocketAddress());
+        if (path.equals("/game")) {
+            // Handle WebSocket for game connections
+            System.out.println("Handling game WebSocket connection");
+            conn.send("Welcome to the Game WebSocket!");
+        } else if (path.equals("/chat")) {
+            // Handle WebSocket for chat connections
+            System.out.println("Handling chat WebSocket connection");
+            conn.send("Welcome to the Chat WebSocket!");
+        } else if (path.equals("/wss")) {
+            // Add the new client connection to the list
+            clients.add(conn);
+            System.out.println("New client connected: " + conn.getRemoteSocketAddress() + "\n\n");
+
+            // Handle WebSocket for admin connections
+            System.out.println("Handling admin WebSocket connection");
+            conn.send("Welcome to the /wss WebSocket!");
+        } else {
+            // Close the connection if the path is unknown
+            System.out.println("Unknown WebSocket path: " + path);
+            conn.send("Unknown WebSocket path: " + path);
+            conn.close();
+        }
     }
 
     @Override

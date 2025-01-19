@@ -8,6 +8,9 @@ public class EnvironmentVariablesController {
     @GetMapping("/get-environment-variables")
     public EnvironmentVariablesReponse getEnvironmentVariables() {
         EnvironmentVariablesReponse envVarResp = new EnvironmentVariablesReponse(System.getenv("IDENTITY_POOL_ID"));
+        System.out.println("getEnvironmentVariables()");
+        System.out.println(envVarResp);
+
         return envVarResp;
     }
 }
