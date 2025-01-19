@@ -9,6 +9,8 @@ import java.net.InetSocketAddress;
 public class BomblandServerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(BomblandServerApplication.class, args);
+		System.out.println("webflux server running on port = " + System.getProperty("local.server.port"));
+
 
 		int port = 8081; // The port to listen on
 		BOMBLAND_WebSocketServer server = new BOMBLAND_WebSocketServer(port);
