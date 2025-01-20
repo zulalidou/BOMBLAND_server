@@ -12,7 +12,7 @@ public class BomblandServerApplication {
 		System.out.println("webflux server running on port = " + System.getProperty("local.server.port"));
 
 
-		int port = 8081; // The port to listen on
+		int port = 443; // The port to listen on
 		BOMBLAND_WebSocketServer server = new BOMBLAND_WebSocketServer(port);
 		server.start();
 		System.out.println("Server started on port " + port);
