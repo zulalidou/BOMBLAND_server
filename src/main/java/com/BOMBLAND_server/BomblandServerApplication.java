@@ -15,7 +15,6 @@ public class BomblandServerApplication {
 		System.out.println("webflux server running on port = " + System.getProperty("local.server.port"));
 		System.out.println("System.getenv(\"PORT\") = " + System.getenv("PORT"));
 
-
 //		BOMBLAND_WebSocketServer server = new BOMBLAND_WebSocketServer(new URI("ws://localhost"));
 //		server.start();
 //		System.out.println("Server started on port " + port);
@@ -23,7 +22,12 @@ public class BomblandServerApplication {
 
 	@PostConstruct
 	public void startWebSocketServer() {
-		BOMBLAND_WebSocketServer myWebSocketServer = new BOMBLAND_WebSocketServer(new InetSocketAddress("wss://bombland-server.onrender.com", 443));
+		System.out.println("\nstartWebSocketServer() - start");
+
+		BOMBLAND_WebSocketServer myWebSocketServer = new BOMBLAND_WebSocketServer(new InetSocketAddress("0.0.0.0", 8081));
+//		BOMBLAND_WebSocketServer myWebSocketServer = new BOMBLAND_WebSocketServer(new InetSocketAddress("localhost", 443));
 		myWebSocketServer.start();
+
+		System.out.println("startWebSocketServer() - end\n");
 	}
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.BOMBLAND_server.BomblandServerApplicationTests" time="7.418" tests="1" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.BOMBLAND_server.BomblandServerApplicationTests" time="3.968" tests="1" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -16,7 +16,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="US"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-17\bin"/>
-    <property name="sun.java.command" value="C:\Users\Galaxy Employee\AppData\Local\Temp\surefire14224094199130386712\surefirebooter-20250121115012904_3.jar C:\Users\Galaxy Employee\AppData\Local\Temp\surefire14224094199130386712 2025-01-21T11-50-12_410-jvmRun1 surefire-20250121115012904_1tmp surefire_0-20250121115012904_2tmp"/>
+    <property name="sun.java.command" value="C:\Users\Galaxy Employee\AppData\Local\Temp\surefire14695573189896775732\surefirebooter-20250121121238777_3.jar C:\Users\Galaxy Employee\AppData\Local\Temp\surefire14695573189896775732 2025-01-21T12-12-38_551-jvmRun1 surefire-20250121121238777_1tmp surefire_0-20250121121238777_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="C:\Users\Galaxy Employee\IdeaProjects\BOMBLAND_server\target\test-classes;C:\Users\Galaxy Employee\IdeaProjects\BOMBLAND_server\target\classes;C:\Users\Galaxy Employee\.m2\repository\org\springframework\boot\spring-boot-starter\3.4.0\spring-boot-starter-3.4.0.jar;C:\Users\Galaxy Employee\.m2\repository\org\springframework\boot\spring-boot\3.4.0\spring-boot-3.4.0.jar;C:\Users\Galaxy Employee\.m2\repository\org\springframework\spring-context\6.2.0\spring-context-6.2.0.jar;C:\Users\Galaxy Employee\.m2\repository\org\springframework\spring-aop\6.2.0\spring-aop-6.2.0.jar;C:\Users\Galaxy Employee\.m2\repository\org\springframework\spring-expression\6.2.0\spring-expression-6.2.0.jar;C:\Users\Galaxy Employee\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\3.4.0\spring-boot-autoconfigure-3.4.0.jar;C:\Users\Galaxy Employee\.m2\repository\org\springframework\boot\spring-boot-starter-logging\3.4.0\spring-boot-starter-logging-3.4.0.jar;C:\Users\Galaxy Employee\.m2\repository\ch\qos\logback\logback-classic\1.5.12\logback-classic-1.5.12.jar;C:\Users\Galaxy Employee\.m2\repository\ch\qos\logback\logback-core\1.5.12\logback-core-1.5.12.jar;C:\Users\Galaxy Employee\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.24.1\log4j-to-slf4j-2.24.1.jar;C:\Users\Galaxy Employee\.m2\repository\org\apache\logging\log4j\log4j-api\2.24.1\log4j-api-2.24.1.jar;C:\Users\Galaxy Employee\.m2\repository\org\slf4j\jul-to-slf4j\2.0.16\jul-to-slf4j-2.0.16.jar;C:\Users\Galaxy Employee\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\Galaxy Employee\.m2\repository\org\springframework\spring-core\6.2.0\spring-core-6.2.0.jar;C:\Users\Galaxy Employee\.m2\repository\org\springframework\spring-jcl\6.2.0\spring-jcl-6.2.0.jar;C:\Users\Galaxy Employee\.m2\repository\org\yaml\snakeyaml\2.3\snakeyaml-2.3.jar;C:\Users\Galaxy Employee\.m2\repository\org\springframework\boot\spring-boot-starter-test\3.4.0\spring-boot-starter-test-3.4.0.jar;C:\Users\Galaxy Employee\.m2\repository\org\springframework\boot\spring-boot-test\3.4.0\spring-boot-test-3.4.0.jar;C:\Users\Galaxy Employee\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\3.4.0\spring-boot-test-autoconfigure-3.4.0.jar;C:\Users\Galaxy Employee\.m2\repository\com\jayway\jsonpath\json-path\2.9.0\json-path-2.9.0.jar;C:\Users\Galaxy Employee\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.2\jakarta.xml.bind-api-4.0.2.jar;C:\Users\Galaxy Employee\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.3\jakarta.activation-api-2.1.3.jar;C:\Users\Galaxy Employee\.m2\repository\net\minidev\json-smart\2.5.1\json-smart-2.5.1.jar;C:\Users\Galaxy Employee\.m2\repository\net\minidev\accessors-smart\2.5.1\accessors-smart-2.5.1.jar;C:\Users\Galaxy Employee\.m2\repository\org\ow2\asm\asm\9.6\asm-9.6.jar;C:\Users\Galaxy Employee\.m2\repository\org\assertj\assertj-core\3.26.3\assertj-core-3.26.3.jar;C:\Users\Galaxy Employee\.m2\repository\net\bytebuddy\byte-buddy\1.15.10\byte-buddy-1.15.10.jar;C:\Users\Galaxy Employee\.m2\repository\org\awaitility\awaitility\4.2.2\awaitility-4.2.2.jar;C:\Users\Galaxy Employee\.m2\repository\org\hamcrest\hamcrest\2.2\hamcrest-2.2.jar;C:\Users\Galaxy Employee\.m2\repository\org\junit\jupiter\junit-jupiter\5.11.3\junit-jupiter-5.11.3.jar;C:\Users\Galaxy Employee\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.11.3\junit-jupiter-api-5.11.3.jar;C:\Users\Galaxy Employee\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\Galaxy Employee\.m2\repository\org\junit\platform\junit-platform-commons\1.11.3\junit-platform-commons-1.11.3.jar;C:\Users\Galaxy Employee\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\Galaxy Employee\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.11.3\junit-jupiter-params-5.11.3.jar;C:\Users\Galaxy Employee\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.11.3\junit-jupiter-engine-5.11.3.jar;C:\Users\Galaxy Employee\.m2\repository\org\junit\platform\junit-platform-engine\1.11.3\junit-platform-engine-1.11.3.jar;C:\Users\Galaxy Employee\.m2\repository\org\mockito\mockito-core\5.14.2\mockito-core-5.14.2.jar;C:\Users\Galaxy Employee\.m2\repository\net\bytebuddy\byte-buddy-agent\1.15.10\byte-buddy-agent-1.15.10.jar;C:\Users\Galaxy Employee\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\Galaxy Employee\.m2\repository\org\mockito\mockito-junit-jupiter\5.14.2\mockito-junit-jupiter-5.14.2.jar;C:\Users\Galaxy Employee\.m2\repository\org\skyscreamer\jsonassert\1.5.3\jsonassert-1.5.3.jar;C:\Users\Galaxy Employee\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\Galaxy Employee\.m2\repository\org\springframework\spring-test\6.2.0\spring-test-6.2.0.jar;C:\Users\Galaxy Employee\.m2\repository\org\xmlunit\xmlunit-core\2.10.0\xmlunit-core-2.10.0.jar;C:\Users\Galaxy Employee\.m2\repository\org\springframework\boot\spring-boot-starter-webflux\3.4.0\spring-boot-starter-webflux-3.4.0.jar;C:\Users\Galaxy Employee\.m2\repository\org\springframework\boot\spring-boot-starter-json\3.4.0\spring-boot-starter-json-3.4.0.jar;C:\Users\Galaxy Employee\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.18.1\jackson-databind-2.18.1.jar;C:\Users\Galaxy Employee\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.18.1\jackson-annotations-2.18.1.jar;C:\Users\Galaxy Employee\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.18.1\jackson-core-2.18.1.jar;C:\Users\Galaxy Employee\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.18.1\jackson-datatype-jdk8-2.18.1.jar;C:\Users\Galaxy Employee\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.18.1\jackson-datatype-jsr310-2.18.1.jar;C:\Users\Galaxy Employee\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.18.1\jackson-module-parameter-names-2.18.1.jar;C:\Users\Galaxy Employee\.m2\repository\org\springframework\boot\spring-boot-starter-reactor-netty\3.4.0\spring-boot-starter-reactor-netty-3.4.0.jar;C:\Users\Galaxy Employee\.m2\repository\io\projectreactor\netty\reactor-netty-http\1.2.0\reactor-netty-http-1.2.0.jar;C:\Users\Galaxy Employee\.m2\repository\io\netty\netty-codec-http\4.1.115.Final\netty-codec-http-4.1.115.Final.jar;C:\Users\Galaxy Employee\.m2\repository\io\netty\netty-common\4.1.115.Final\netty-common-4.1.115.Final.jar;C:\Users\Galaxy Employee\.m2\repository\io\netty\netty-buffer\4.1.115.Final\netty-buffer-4.1.115.Final.jar;C:\Users\Galaxy Employee\.m2\repository\io\netty\netty-transport\4.1.115.Final\netty-transport-4.1.115.Final.jar;C:\Users\Galaxy Employee\.m2\repository\io\netty\netty-codec\4.1.115.Final\netty-codec-4.1.115.Final.jar;C:\Users\Galaxy Employee\.m2\repository\io\netty\netty-handler\4.1.115.Final\netty-handler-4.1.115.Final.jar;C:\Users\Galaxy Employee\.m2\repository\io\netty\netty-codec-http2\4.1.115.Final\netty-codec-http2-4.1.115.Final.jar;C:\Users\Galaxy Employee\.m2\repository\io\netty\netty-resolver-dns\4.1.115.Final\netty-resolver-dns-4.1.115.Final.jar;C:\Users\Galaxy Employee\.m2\repository\io\netty\netty-resolver\4.1.115.Final\netty-resolver-4.1.115.Final.jar;C:\Users\Galaxy Employee\.m2\repository\io\netty\netty-codec-dns\4.1.115.Final\netty-codec-dns-4.1.115.Final.jar;C:\Users\Galaxy Employee\.m2\repository\io\netty\netty-resolver-dns-native-macos\4.1.115.Final\netty-resolver-dns-native-macos-4.1.115.Final-osx-x86_64.jar;C:\Users\Galaxy Employee\.m2\repository\io\netty\netty-resolver-dns-classes-macos\4.1.115.Final\netty-resolver-dns-classes-macos-4.1.115.Final.jar;C:\Users\Galaxy Employee\.m2\repository\io\netty\netty-transport-native-epoll\4.1.115.Final\netty-transport-native-epoll-4.1.115.Final-linux-x86_64.jar;C:\Users\Galaxy Employee\.m2\repository\io\netty\netty-transport-native-unix-common\4.1.115.Final\netty-transport-native-unix-common-4.1.115.Final.jar;C:\Users\Galaxy Employee\.m2\repository\io\netty\netty-transport-classes-epoll\4.1.115.Final\netty-transport-classes-epoll-4.1.115.Final.jar;C:\Users\Galaxy Employee\.m2\repository\io\projectreactor\netty\reactor-netty-core\1.2.0\reactor-netty-core-1.2.0.jar;C:\Users\Galaxy Employee\.m2\repository\io\netty\netty-handler-proxy\4.1.115.Final\netty-handler-proxy-4.1.115.Final.jar;C:\Users\Galaxy Employee\.m2\repository\io\netty\netty-codec-socks\4.1.115.Final\netty-codec-socks-4.1.115.Final.jar;C:\Users\Galaxy Employee\.m2\repository\org\springframework\spring-web\6.2.0\spring-web-6.2.0.jar;C:\Users\Galaxy Employee\.m2\repository\org\springframework\spring-beans\6.2.0\spring-beans-6.2.0.jar;C:\Users\Galaxy Employee\.m2\repository\io\micrometer\micrometer-observation\1.14.1\micrometer-observation-1.14.1.jar;C:\Users\Galaxy Employee\.m2\repository\io\micrometer\micrometer-commons\1.14.1\micrometer-commons-1.14.1.jar;C:\Users\Galaxy Employee\.m2\repository\org\springframework\spring-webflux\6.2.0\spring-webflux-6.2.0.jar;C:\Users\Galaxy Employee\.m2\repository\io\projectreactor\reactor-core\3.7.0\reactor-core-3.7.0.jar;C:\Users\Galaxy Employee\.m2\repository\org\reactivestreams\reactive-streams\1.0.4\reactive-streams-1.0.4.jar;C:\Users\Galaxy Employee\.m2\repository\org\java-websocket\Java-WebSocket\1.6.0\Java-WebSocket-1.6.0.jar;C:\Users\Galaxy Employee\.m2\repository\org\slf4j\slf4j-api\2.0.16\slf4j-api-2.0.16.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -33,7 +33,7 @@
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="FILE_LOG_CHARSET" value="windows-1252"/>
     <property name="java.awt.headless" value="true"/>
-    <property name="surefire.real.class.path" value="C:\Users\Galaxy Employee\AppData\Local\Temp\surefire14224094199130386712\surefirebooter-20250121115012904_3.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\Galaxy Employee\AppData\Local\Temp\surefire14695573189896775732\surefirebooter-20250121121238777_3.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="17.0.9+11-LTS-201"/>
@@ -50,7 +50,7 @@
     <property name="user.dir" value="C:\Users\Galaxy Employee\IdeaProjects\BOMBLAND_server"/>
     <property name="os.arch" value="amd64"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="PID" value="7212"/>
+    <property name="PID" value="1120"/>
     <property name="sun.os.patch.level" value=""/>
     <property name="CONSOLE_LOG_CHARSET" value="windows-1252"/>
     <property name="native.encoding" value="Cp1252"/>
@@ -62,9 +62,9 @@
     <property name="java.class.version" value="61.0"/>
     <property name="LOGGED_APPLICATION_NAME" value="[BOMBLAND_server] "/>
   </properties>
-  <testcase name="contextLoads" classname="com.BOMBLAND_server.BomblandServerApplicationTests" time="1.98">
-    <system-out><![CDATA[11:50:14.970 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.BOMBLAND_server.BomblandServerApplicationTests]: BomblandServerApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-11:50:15.292 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.BOMBLAND_server.BomblandServerApplication for test class com.BOMBLAND_server.BomblandServerApplicationTests
+  <testcase name="contextLoads" classname="com.BOMBLAND_server.BomblandServerApplicationTests" time="1.577">
+    <system-out><![CDATA[12:12:39.778 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.BOMBLAND_server.BomblandServerApplicationTests]: BomblandServerApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+12:12:39.929 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.BOMBLAND_server.BomblandServerApplication for test class com.BOMBLAND_server.BomblandServerApplicationTests
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -75,50 +75,17 @@
 
  :: Spring Boot ::                (v3.4.0)
 
-2025-01-21T11:50:16.484-08:00  INFO 7212 --- [BOMBLAND_server] [           main] c.B.BomblandServerApplicationTests       : Starting BomblandServerApplicationTests using Java 17.0.9 with PID 7212 (started by Galaxy Employee in C:\Users\Galaxy Employee\IdeaProjects\BOMBLAND_server)
-2025-01-21T11:50:16.487-08:00  INFO 7212 --- [BOMBLAND_server] [           main] c.B.BomblandServerApplicationTests       : No active profile set, falling back to 1 default profile: "default"
-2025-01-21T11:50:18.263-08:00 ERROR 7212 --- [BOMBLAND_server] [cketSelector-30] o.java_websocket.server.WebSocketServer  : Shutdown due to fatal error
+2025-01-21T12:12:40.460-08:00  INFO 1120 --- [BOMBLAND_server] [           main] c.B.BomblandServerApplicationTests       : Starting BomblandServerApplicationTests using Java 17.0.9 with PID 1120 (started by Galaxy Employee in C:\Users\Galaxy Employee\IdeaProjects\BOMBLAND_server)
+2025-01-21T12:12:40.464-08:00  INFO 1120 --- [BOMBLAND_server] [           main] c.B.BomblandServerApplicationTests       : No active profile set, falling back to 1 default profile: "default"
 
-java.net.SocketException: Unresolved address
-	at java.base/sun.nio.ch.Net.translateToSocketException(Net.java:189) ~[na:na]
-	at java.base/sun.nio.ch.Net.translateException(Net.java:217) ~[na:na]
-	at java.base/sun.nio.ch.Net.translateException(Net.java:223) ~[na:na]
-	at java.base/sun.nio.ch.ServerSocketAdaptor.bind(ServerSocketAdaptor.java:91) ~[na:na]
-	at org.java_websocket.server.WebSocketServer.doSetupSelectorAndServerThread(WebSocketServer.java:616) ~[Java-WebSocket-1.6.0.jar:na]
-	at org.java_websocket.server.WebSocketServer.run(WebSocketServer.java:407) ~[Java-WebSocket-1.6.0.jar:na]
-	at java.base/java.lang.Thread.run(Thread.java:842) ~[na:na]
-Caused by: java.nio.channels.UnresolvedAddressException: null
-	at java.base/sun.nio.ch.Net.checkAddress(Net.java:149) ~[na:na]
-	at java.base/sun.nio.ch.Net.checkAddress(Net.java:157) ~[na:na]
-	at java.base/sun.nio.ch.ServerSocketChannelImpl.netBind(ServerSocketChannelImpl.java:330) ~[na:na]
-	at java.base/sun.nio.ch.ServerSocketChannelImpl.bind(ServerSocketChannelImpl.java:294) ~[na:na]
-	at java.base/sun.nio.ch.ServerSocketAdaptor.bind(ServerSocketAdaptor.java:89) ~[na:na]
-	... 3 common frames omitted
+startWebSocketServer() - start
+startWebSocketServer() - end
 
-onError()
-==============
-java.nio.channels.UnresolvedAddressException
---------------
-Unresolved address
---------------
-==============
-2025-01-21T11:50:19.894-08:00  INFO 7212 --- [BOMBLAND_server] [           main] c.B.BomblandServerApplicationTests       : Started BomblandServerApplicationTests in 4.199 seconds (process running for 6.661)
+
+onStart()
+onStart() == WebSocket server started successfully == onStart()
+
+2025-01-21T12:12:41.984-08:00  INFO 1120 --- [BOMBLAND_server] [           main] c.B.BomblandServerApplicationTests       : Started BomblandServerApplicationTests in 1.874 seconds (process running for 3.044)
 ]]></system-out>
-    <system-err><![CDATA[java.net.SocketException: Unresolved address
-	at java.base/sun.nio.ch.Net.translateToSocketException(Net.java:189)
-	at java.base/sun.nio.ch.Net.translateException(Net.java:217)
-	at java.base/sun.nio.ch.Net.translateException(Net.java:223)
-	at java.base/sun.nio.ch.ServerSocketAdaptor.bind(ServerSocketAdaptor.java:91)
-	at org.java_websocket.server.WebSocketServer.doSetupSelectorAndServerThread(WebSocketServer.java:616)
-	at org.java_websocket.server.WebSocketServer.run(WebSocketServer.java:407)
-	at java.base/java.lang.Thread.run(Thread.java:842)
-Caused by: java.nio.channels.UnresolvedAddressException
-	at java.base/sun.nio.ch.Net.checkAddress(Net.java:149)
-	at java.base/sun.nio.ch.Net.checkAddress(Net.java:157)
-	at java.base/sun.nio.ch.ServerSocketChannelImpl.netBind(ServerSocketChannelImpl.java:330)
-	at java.base/sun.nio.ch.ServerSocketChannelImpl.bind(ServerSocketChannelImpl.java:294)
-	at java.base/sun.nio.ch.ServerSocketAdaptor.bind(ServerSocketAdaptor.java:89)
-	... 3 more
-]]></system-err>
   </testcase>
 </testsuite>

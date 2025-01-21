@@ -23,7 +23,7 @@ public class BOMBLAND_WebSocketServer extends WebSocketServer {
         System.out.println("onOpen()");
         System.out.println("conn: " + conn);
         System.out.println("handshake: " + handshake);
-        System.out.println("path: " + path + "\n\n");
+        System.out.println("path: " + path + "\n");
 
 //        if (path.equals("/game")) {
 //            // Handle WebSocket for game connections
@@ -36,7 +36,7 @@ public class BOMBLAND_WebSocketServer extends WebSocketServer {
 //        } else if (path.equals("/wss")) {
             // Add the new client connection to the list
             clients.add(conn);
-            System.out.println("New client connected: " + conn.getRemoteSocketAddress() + "\n\n");
+            System.out.println("New client connected: " + conn.getRemoteSocketAddress());
 
             // Handle WebSocket for admin connections
             System.out.println("Handling admin WebSocket connection");
@@ -85,8 +85,8 @@ public class BOMBLAND_WebSocketServer extends WebSocketServer {
 
     @Override
     public void onStart() {
-        System.out.println("onStart()");
-        System.out.println("WebSocket server started successfully.");
+        System.out.println("\nonStart()");
+        System.out.println("onStart() == WebSocket server started successfully == onStart()\n");
     }
 
     // Method to broadcast the new high score to all other connected clients
