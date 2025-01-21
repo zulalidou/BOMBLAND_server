@@ -20,14 +20,14 @@ public class BomblandServerApplication {
 //		System.out.println("Server started on port " + port);
 	}
 
-	@PostConstruct
-	public void startWebSocketServer() {
-		System.out.println("\nstartWebSocketServer() - start");
-
-		BOMBLAND_WebSocketServer myWebSocketServer = new BOMBLAND_WebSocketServer(new InetSocketAddress("0.0.0.0", 8081));
-//		BOMBLAND_WebSocketServer myWebSocketServer = new BOMBLAND_WebSocketServer(new InetSocketAddress("localhost", 443));
-		myWebSocketServer.start();
-
-		System.out.println("startWebSocketServer() - end\n");
-	}
+//	@PostConstruct
+//	public void startWebSocketServer() {
+//		System.out.println("\nstartWebSocketServer() - start");
+//
+//		BOMBLAND_WebSocketServer myWebSocketServer = new BOMBLAND_WebSocketServer(new InetSocketAddress("0.0.0.0", 8081));
+////		BOMBLAND_WebSocketServer myWebSocketServer = new BOMBLAND_WebSocketServer(new InetSocketAddress("localhost", 443));
+//		myWebSocketServer.start();
+//
+//		System.out.println("startWebSocketServer() - end\n");
+//	}
 }

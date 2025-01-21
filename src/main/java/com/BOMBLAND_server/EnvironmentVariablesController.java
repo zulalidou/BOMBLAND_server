@@ -14,7 +14,7 @@ public class EnvironmentVariablesController {
         EnvironmentVariablesReponse envVarResp = new EnvironmentVariablesReponse(System.getenv("IDENTITY_POOL_ID"));
         System.out.println("getEnvironmentVariables()");
         System.out.println(envVarResp);
-        System.out.println("webflux server running on port = " + System.getProperty("local.server.port"));
+        System.out.println("webflux server running on port = " + System.getenv("PORT"));
 
         return envVarResp;
     }
