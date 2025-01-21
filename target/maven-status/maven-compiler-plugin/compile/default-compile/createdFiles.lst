@@ -1,6 +1,7 @@
 com\BOMBLAND_server\HighScore.class
 com\BOMBLAND_server\EnvironmentVariablesReponse.class
 com\BOMBLAND_server\BomblandServerApplication.class
+com\BOMBLAND_server\WebSocketServerConfiguration.class
 com\BOMBLAND_server\EnvironmentVariablesController.class
 com\BOMBLAND_server\BOMBLAND_WebSocketServer.class
 com\BOMBLAND_server\DynamoDBEvent_Controller.class

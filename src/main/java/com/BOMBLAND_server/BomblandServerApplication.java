@@ -1,20 +1,29 @@
 package com.BOMBLAND_server;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @SpringBootApplication
 public class BomblandServerApplication {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws URISyntaxException {
 		SpringApplication.run(BomblandServerApplication.class, args);
 		System.out.println("webflux server running on port = " + System.getProperty("local.server.port"));
+		System.out.println("System.getenv(\"PORT\") = " + System.getenv("PORT"));
 
 
-		int port = 443; // The port to listen on
-		BOMBLAND_WebSocketServer server = new BOMBLAND_WebSocketServer(port);
-		server.start();
-		System.out.println("Server started on port " + port);
+//		BOMBLAND_WebSocketServer server = new BOMBLAND_WebSocketServer(new URI("ws://localhost"));
+//		server.start();
+//		System.out.println("Server started on port " + port);
+	}
+
+	@PostConstruct
+	public void startWebSocketServer() {
+		BOMBLAND_WebSocketServer myWebSocketServer = new BOMBLAND_WebSocketServer(new InetSocketAddress("wss://bombland-server.onrender.com", 443));
+		myWebSocketServer.start();
 	}
 }
