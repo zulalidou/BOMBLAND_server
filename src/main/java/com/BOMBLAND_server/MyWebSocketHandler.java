@@ -24,15 +24,19 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         System.out.println("handleTextMessage()");
         System.out.println("Received message: " + message.getPayload());
-        broadcastHighScore(message.getPayload());
+        broadcastHighScore(session, message.getPayload());
     }
 
-    private void broadcastHighScore(String highScore) {
+    private void broadcastHighScore(WebSocketSession currentSession, String highScore) {
         System.out.println("broadcastHighScore()");
 
         // Broadcast the new high score to all connected clients
         synchronized (sessions) {
             for (WebSocketSession session: sessions) {
+                if (currentSession == session) {
+                    continue;
+                }
+
                 try {
                     session.sendMessage(new TextMessage(highScore)); // Send the message to each client
                 } catch (IOException e) {
