@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class DynamoDBEvent_Controller {
-    @PostMapping("/database-changes")
+    @PostMapping("/webflux/database-changes")
     public ResponseEntity<String> handleInserts(@RequestBody HighScore newHighScore) {
         System.out.println("newHighScore.id = " + newHighScore.getID());
         System.out.println("newHighScore.score = " + newHighScore.getScore());

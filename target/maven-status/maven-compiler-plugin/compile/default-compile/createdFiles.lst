@@ -1,7 +1,6 @@
 com\BOMBLAND_server\HighScore.class
 com\BOMBLAND_server\EnvironmentVariablesReponse.class
 com\BOMBLAND_server\BomblandServerApplication.class
-com\BOMBLAND_server\WebFluxRouterConfig.class
 com\BOMBLAND_server\WebSocketConfig.class
 com\BOMBLAND_server\MyWebSocketHandler.class
 com\BOMBLAND_server\EnvironmentVariablesController.class
