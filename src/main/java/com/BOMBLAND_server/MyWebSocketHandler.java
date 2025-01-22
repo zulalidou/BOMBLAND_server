@@ -24,7 +24,7 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         System.out.println("handleTextMessage()");
         System.out.println("Received message: " + message.getPayload());
-        broadcastHighScore(String.valueOf(message));
+        broadcastHighScore(message.getPayload());
     }
 
     private void broadcastHighScore(String highScore) {

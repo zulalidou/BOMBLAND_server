@@ -1,6 +1,5 @@
 package com.BOMBLAND_server;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -8,12 +7,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DynamoDBEvent_Controller {
     @PostMapping("/webflux/database-changes")
-    public ResponseEntity<String> handleInserts(@RequestBody HighScore newHighScore) {
+    public HighScore handleInserts(@RequestBody HighScore newHighScore) {
         System.out.println("newHighScore.id = " + newHighScore.getID());
         System.out.println("newHighScore.score = " + newHighScore.getScore());
         System.out.println("newHighScore.name = " + newHighScore.getName());
 
-        return ResponseEntity.ok("Request processed successfully!");
+        return newHighScore;
     }
 }
 
