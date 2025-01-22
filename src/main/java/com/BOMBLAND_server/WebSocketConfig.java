@@ -10,7 +10,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new MyWebSocketHandler(), "/wss")
+        registry.addHandler(new MyWebSocketHandler(), "/websocket/distribute-new-highscore")
                 .setAllowedOrigins("*");
     }
 }

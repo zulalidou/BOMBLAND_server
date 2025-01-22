@@ -9,9 +9,7 @@ public class EnvironmentVariablesController {
     public EnvironmentVariablesReponse getEnvironmentVariables() {
         EnvironmentVariablesReponse envVarResp = new EnvironmentVariablesReponse(System.getenv("IDENTITY_POOL_ID"));
         System.out.println("getEnvironmentVariables()");
-        System.out.println(envVarResp);
         System.out.println("webflux server running on port = " + System.getenv("PORT"));
-
         return envVarResp;
     }
 }
@@ -21,9 +19,5 @@ class EnvironmentVariablesReponse {
 
     public EnvironmentVariablesReponse(String identityPoolID) {
         this.identityPoolID = identityPoolID;
-    }
-
-    public String getIdentityPoolID() {
-        return identityPoolID;
     }
 }
