@@ -13,9 +13,9 @@ public class WebFluxRouterConfig {
     public RouterFunction<ServerResponse> route() {
         return RouterFunctions
                 // Define routes
-                .route(RequestPredicates.GET("/"), this::handleDefaultRoute)
-                .andRoute(RequestPredicates.GET("/route2"), this::handleRoute2)
-                .andRoute(RequestPredicates.GET("/get-environment-variables"), this::handleGetEnvironmentVariables);
+                .route(RequestPredicates.GET("/webflux/"), this::handleDefaultRoute)
+                .andRoute(RequestPredicates.GET("/webflux/route2"), this::handleRoute2)
+                .andRoute(RequestPredicates.GET("/webflux/get-environment-variables"), this::handleGetEnvironmentVariables);
     }
 
 
