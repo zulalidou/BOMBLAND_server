@@ -20,4 +20,8 @@ class EnvironmentVariablesReponse {
     public EnvironmentVariablesReponse(String identityPoolID) {
         this.identityPoolID = identityPoolID;
     }
+
+    public String getIdentityPoolID() {
+        return identityPoolID;
+    }
 }
