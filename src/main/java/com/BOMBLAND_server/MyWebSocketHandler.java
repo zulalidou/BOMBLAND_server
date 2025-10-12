@@ -52,17 +52,25 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
     JSONObject payload = new JSONObject(message.getPayload());
     System.out.println("payload: " + payload + "\n");
 
+    ArrayList<WebSocketSession> sessionsList = null;
+    JSONObject roomInfo = null;
+    ArrayList<WebSocketSession> roomMembers = null;
+
     switch (payload.getString("message_type")) {
       case "HIGH_SCORE_INFO":
         System.out.println("HIGH_SCORE_INFO");
+
+        payload.remove("message_type");
         broadcastMessage(session, message.getPayload());
+
         return;
 
       case "CREATE_ROOM":
-        payload.remove("message_type");
         System.out.println("CREATE_ROOM");
 
-        ArrayList<WebSocketSession> sessionsList = new ArrayList<>();
+        payload.remove("message_type");
+
+        sessionsList = new ArrayList<>();
         sessionsList.add(session);
         Room_Members.put(payload.getString("id"), sessionsList);
         Room_Info.put(payload.getString("id"), payload);
@@ -87,38 +95,64 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
       case "JOIN_ROOM":
         System.out.println("JOIN_ROOM");
 
-        ArrayList<WebSocketSession> updatedSessionsList = Room_Members.get(payload.getString("id"));
-        updatedSessionsList.add(session);
-        Room_Members.put(payload.getString("id"), updatedSessionsList);
+        sessionsList = Room_Members.get(payload.getString("id"));
+        sessionsList.add(session);
 
-        JSONObject updatedRoomInfo = Room_Info.get(payload.getString("id"));
-        updatedRoomInfo.put("player2", payload.getString("player2"));
-        Room_Info.put(payload.getString("id"), updatedRoomInfo);
+        roomInfo = Room_Info.get(payload.getString("id"));
+        roomInfo.put("player2", payload.getString("player2"));
 
         JSONObject player1responseObj = new JSONObject();
         player1responseObj.put("message_type", "PLAYER_JOINED_ROOM");
         player1responseObj.put("player2", payload.getString("player2"));
         TextMessage player1Msg = new TextMessage(player1responseObj.toString());
 
-        JSONObject player2responseObj = new JSONObject(updatedRoomInfo, JSONObject.getNames(updatedRoomInfo)); // copy-by-value
+        JSONObject player2responseObj = new JSONObject(roomInfo, JSONObject.getNames(roomInfo)); // copy-by-value
         player2responseObj.put("message_type", "JOIN_ROOM");
         TextMessage player2Msg = new TextMessage(player2responseObj.toString());
 
-        updatedSessionsList.get(0).sendMessage(player1Msg); // sends player1 player2's username
-        updatedSessionsList.get(1).sendMessage(player2Msg); // sends player2 room info
+        sessionsList.get(0).sendMessage(player1Msg); // sends player1 player2's username
+        sessionsList.get(1).sendMessage(player2Msg); // sends player2 room info
 
         return;
 
       case "UPDATE_READY_STATE_UI", "UPDATE_SETTINGS_UI":
         System.out.println("UPDATE_READY_STATE_UI || UPDATE_SETTINGS_UI");
 
-        ArrayList<WebSocketSession> roomMembers = Room_Members.get(payload.get("roomId"));
+        roomMembers = Room_Members.get(payload.get("roomId"));
         TextMessage payloadMsg = new TextMessage(payload.toString());
 
         if (roomMembers.get(0) == session) {
           roomMembers.get(1).sendMessage(payloadMsg);
         } else {
           roomMembers.get(0).sendMessage(payloadMsg);
+        }
+
+        return;
+
+      case "LEAVE_ROOM":
+        System.out.println("\nLEAVE_ROOM");
+
+        if (Room_Info.get(payload.get("roomId")) != null) {
+          roomInfo = Room_Info.get(payload.get("roomId"));
+          roomMembers = Room_Members.get(payload.get("roomId"));
+
+          // Player1 is leaving the room
+          if (roomInfo.get("player1").equals(payload.get("playerName"))) {
+            TextMessage leaveRoomMsg = new TextMessage(payload.toString());
+
+            if (roomMembers.size() == 2) {
+              roomMembers.get(1).sendMessage(leaveRoomMsg);
+            }
+
+            Room_Members.remove(payload.get("roomId"));
+            Room_Info.remove(payload.get("roomId"));
+          } else { // Player2 is leaving the room
+            TextMessage leaveRoomMsg = new TextMessage(payload.toString());
+            roomMembers.get(0).sendMessage(leaveRoomMsg);
+
+            roomMembers.remove(1);
+            roomInfo.remove("player2");
+          }
         }
 
         return;
