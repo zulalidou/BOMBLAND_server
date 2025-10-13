@@ -155,6 +155,14 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
           }
         }
 
+      case "JOIN_GAME_MAP":
+        // Player1 has started the game, and a msg needs to be sent to Player2 to let them know to go to the Game map
+        System.out.println("\nJOIN_GAME_MAP");
+        roomMembers = Room_Members.get(payload.get("roomId"));
+
+        TextMessage gameSettingsMsg = new TextMessage(payload.toString());
+        roomMembers.get(1).sendMessage(gameSettingsMsg);
+
         return;
 
       default:
