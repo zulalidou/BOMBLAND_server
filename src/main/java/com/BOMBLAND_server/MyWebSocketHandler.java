@@ -17,6 +17,9 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
   private final Set<WebSocketSession> Sessions = Collections.synchronizedSet(new HashSet<>());
   private final HashMap<String, ArrayList<WebSocketSession>> Room_Members = new HashMap<>();
   private final HashMap<String, JSONObject> Room_Info = new HashMap<>();
+  private final HashMap<String, MultiplayerGameMap> GameMap_Info = new HashMap<>();
+
+  private final Object lock = new Object(); // The lock object
 
   /**
    * A callback method that's invoked immediately after a new WebSocket connection is successfully opened.
@@ -52,123 +55,63 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
     JSONObject payload = new JSONObject(message.getPayload());
     System.out.println("payload: " + payload + "\n");
 
-    ArrayList<WebSocketSession> sessionsList = null;
-    JSONObject roomInfo = null;
-    ArrayList<WebSocketSession> roomMembers = null;
-
     switch (payload.getString("message_type")) {
       case "HIGH_SCORE_INFO":
         System.out.println("HIGH_SCORE_INFO");
-
         payload.remove("message_type");
-        broadcastMessage(session, message.getPayload());
-
-        return;
+        handleHighScoreInfo(message, session);
+        break;
 
       case "CREATE_ROOM":
         System.out.println("CREATE_ROOM");
-
-        payload.remove("message_type");
-
-        sessionsList = new ArrayList<>();
-        sessionsList.add(session);
-        Room_Members.put(payload.getString("id"), sessionsList);
-        Room_Info.put(payload.getString("id"), payload);
-
-        return;
+        handleCreateRoom(payload, session);
+        break;
 
       case "CHECK_ROOM":
         System.out.println("CHECK_ROOM");
-
-        if (Room_Info.get(payload.getString("id")) != null) {
-          payload.put("room_exists", "True");
-        } else {
-          payload.put("room_exists", "False");
-        }
-
-        String responseString = payload.toString();
-        TextMessage responseMsg = new TextMessage(responseString);
-        session.sendMessage(responseMsg);
-
-        return;
+        handleCheckRoom(payload, session);
+        break;
 
       case "JOIN_ROOM":
         System.out.println("JOIN_ROOM");
-
-        sessionsList = Room_Members.get(payload.getString("id"));
-        sessionsList.add(session);
-
-        roomInfo = Room_Info.get(payload.getString("id"));
-        roomInfo.put("player2", payload.getString("player2"));
-
-        JSONObject player1responseObj = new JSONObject();
-        player1responseObj.put("message_type", "PLAYER_JOINED_ROOM");
-        player1responseObj.put("player2", payload.getString("player2"));
-        TextMessage player1Msg = new TextMessage(player1responseObj.toString());
-
-        JSONObject player2responseObj = new JSONObject(roomInfo, JSONObject.getNames(roomInfo)); // copy-by-value
-        player2responseObj.put("message_type", "JOIN_ROOM");
-        TextMessage player2Msg = new TextMessage(player2responseObj.toString());
-
-        sessionsList.get(0).sendMessage(player1Msg); // sends player1 player2's username
-        sessionsList.get(1).sendMessage(player2Msg); // sends player2 room info
-
-        return;
+        handleJoinRoom(payload, session);
+        break;
 
       case "UPDATE_READY_STATE_UI", "UPDATE_SETTINGS_UI":
         System.out.println("UPDATE_READY_STATE_UI || UPDATE_SETTINGS_UI");
-
-        roomMembers = Room_Members.get(payload.get("roomId"));
-        TextMessage payloadMsg = new TextMessage(payload.toString());
-
-        if (roomMembers.get(0) == session) {
-          roomMembers.get(1).sendMessage(payloadMsg);
-        } else {
-          roomMembers.get(0).sendMessage(payloadMsg);
-        }
-
-        return;
+        handleUpdateSettings(payload, session);
+        break;
 
       case "LEAVE_ROOM":
         System.out.println("\nLEAVE_ROOM");
-
-        if (Room_Info.get(payload.get("roomId")) != null) {
-          roomInfo = Room_Info.get(payload.get("roomId"));
-          roomMembers = Room_Members.get(payload.get("roomId"));
-
-          // Player1 is leaving the room
-          if (roomInfo.get("player1").equals(payload.get("playerName"))) {
-            TextMessage leaveRoomMsg = new TextMessage(payload.toString());
-
-            if (roomMembers.size() == 2) {
-              roomMembers.get(1).sendMessage(leaveRoomMsg);
-            }
-
-            Room_Members.remove(payload.get("roomId"));
-            Room_Info.remove(payload.get("roomId"));
-          } else { // Player2 is leaving the room
-            TextMessage leaveRoomMsg = new TextMessage(payload.toString());
-            roomMembers.get(0).sendMessage(leaveRoomMsg);
-
-            roomMembers.remove(1);
-            roomInfo.remove("player2");
-          }
-        }
+        handleLeaveRoom(payload, session);
+        break;
 
       case "JOIN_GAME_MAP":
         // Player1 has started the game, and a msg needs to be sent to Player2 to let them know to go to the Game map
         System.out.println("\nJOIN_GAME_MAP");
-        roomMembers = Room_Members.get(payload.get("roomId"));
+        handleJoinGameMap(payload, session);
+        break;
 
-        TextMessage gameSettingsMsg = new TextMessage(payload.toString());
-        roomMembers.get(1).sendMessage(gameSettingsMsg);
+      case "FIRST_TILE_CLICK":
+        // Both Player1 and Player2 attempt to set the coordinates of the first tile clicked.
+        System.out.println("\nFIRST_TILE_CLICK");
+        handleFirstTileClick(payload, session);
+        break;
 
-        return;
+      case "TILE_CLICKED":
+        System.out.println("\nTILE_CLICKED");
+        handleTileClicked(payload, session);
+        break;
+
+      case "GAME_OVER":
+        System.out.println("\nGAME_OVER");
+        handleGameOver(payload, session);
+        break;
 
       default:
         // do nothing
         System.out.println("DEFAULT case called");
-        break;
     }
   }
 
@@ -196,6 +139,213 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
         }
       }
     }
+  }
+
+  private void handleHighScoreInfo(TextMessage message, WebSocketSession session) {
+    broadcastMessage(session, message.getPayload());
+  }
+
+  private void handleCreateRoom(JSONObject payload, WebSocketSession session) {
+    payload.remove("message_type");
+
+    ArrayList<WebSocketSession> sessionsList = new ArrayList<>();
+    sessionsList.add(session);
+    
+    Room_Members.put(payload.getString("id"), sessionsList);
+    Room_Info.put(payload.getString("id"), payload);
+  }
+
+  private void handleCheckRoom(JSONObject payload, WebSocketSession session) throws IOException {
+    if (Room_Info.get(payload.getString("id")) != null) {
+      payload.put("room_exists", "True");
+    } else {
+      payload.put("room_exists", "False");
+    }
+
+    String responseString = payload.toString();
+    TextMessage responseMsg = new TextMessage(responseString);
+    session.sendMessage(responseMsg);
+  }
+
+  private void handleJoinRoom(JSONObject payload, WebSocketSession session) throws IOException {
+    ArrayList<WebSocketSession> sessionsList = Room_Members.get(payload.getString("id"));
+    sessionsList.add(session);
+
+    JSONObject roomInfo = Room_Info.get(payload.getString("id"));
+    roomInfo.put("player2", payload.getString("player2"));
+
+    JSONObject player1responseObj = new JSONObject();
+    player1responseObj.put("message_type", "PLAYER_JOINED_ROOM");
+    player1responseObj.put("player2", payload.getString("player2"));
+    TextMessage player1Msg = new TextMessage(player1responseObj.toString());
+
+    JSONObject player2responseObj = new JSONObject(roomInfo, JSONObject.getNames(roomInfo)); // copy-by-value
+    player2responseObj.put("message_type", "JOIN_ROOM");
+    TextMessage player2Msg = new TextMessage(player2responseObj.toString());
+
+    sessionsList.get(0).sendMessage(player1Msg); // sends player1 player2's username
+    sessionsList.get(1).sendMessage(player2Msg); // sends player2 room info
+  }
+
+  private void handleUpdateSettings(JSONObject payload, WebSocketSession session) throws IOException {
+    ArrayList<WebSocketSession> roomMembers = Room_Members.get(payload.get("roomId"));
+    TextMessage payloadMsg = new TextMessage(payload.toString());
+
+    if (roomMembers.get(0) == session) {
+      roomMembers.get(1).sendMessage(payloadMsg);
+    } else {
+      roomMembers.get(0).sendMessage(payloadMsg);
+    }
+  }
+
+  private void handleLeaveRoom(JSONObject payload, WebSocketSession session) throws IOException {
+    if (Room_Info.get(payload.get("roomId")) != null) {
+      JSONObject roomInfo = Room_Info.get(payload.get("roomId"));
+      ArrayList<WebSocketSession> roomMembers = Room_Members.get(payload.get("roomId"));
+
+      // Player1 is leaving the room
+      if (isPlayer1(session, payload.getString("roomId"))) {
+        if (roomMembers.size() == 2) {
+          TextMessage leaveRoomMsg = new TextMessage(payload.toString());
+          roomMembers.get(1).sendMessage(leaveRoomMsg);
+        }
+
+        Room_Members.remove(payload.get("roomId"));
+        Room_Info.remove(payload.get("roomId"));
+      } else { // Player2 is leaving the room
+        TextMessage leaveRoomMsg = new TextMessage(payload.toString());
+        roomMembers.get(0).sendMessage(leaveRoomMsg);
+
+        roomMembers.remove(1);
+        roomInfo.remove("player2");
+      }
+    }
+  }
+
+  private void handleJoinGameMap(JSONObject payload, WebSocketSession session) throws IOException {
+    GameMap_Info.put(payload.get("roomId").toString(), new MultiplayerGameMap());
+
+    ArrayList<WebSocketSession> roomMembers = Room_Members.get(payload.get("roomId"));
+    TextMessage gameSettingsMsg = new TextMessage(payload.toString());
+    roomMembers.get(1).sendMessage(gameSettingsMsg);
+  }
+
+  private void handleFirstTileClick(JSONObject payload, WebSocketSession session) throws IOException {
+    synchronized (lock) {
+      MultiplayerGameMap gameMap = GameMap_Info.get(payload.get("roomId"));
+
+      if (!gameMap.gameStarted) {
+        gameMap.gameStarted = true;
+
+        int tileRow = payload.getInt("row");
+        int tileCol = payload.getInt("col");
+
+        HashSet<Integer> columns = new HashSet<>();
+        columns.add(tileCol);
+        gameMap.coordinatesClicked.put(tileRow, columns);
+
+        if (isPlayer1(session, payload.getString("roomId"))) {
+          gameMap.player1Points++;
+        } else {
+          gameMap.player2Points++;
+        }
+
+        ArrayList<WebSocketSession> roomMembers = Room_Members.get(payload.get("roomId"));
+        TextMessage initialGameMsg = new TextMessage(payload.toString());
+
+        roomMembers.get(0).sendMessage(initialGameMsg);
+        roomMembers.get(1).sendMessage(initialGameMsg);
+      }
+    }
+  }
+
+  private void handleTileClicked(JSONObject payload, WebSocketSession session) throws IOException {
+    synchronized (lock) {
+      int tileRow = payload.getInt("row");
+      int tileCol = payload.getInt("col");
+
+      MultiplayerGameMap gameMap = GameMap_Info.get(payload.get("roomId"));
+      ArrayList<WebSocketSession> roomMembers = null;
+
+      if (gameMap.coordinatesClicked.containsKey(tileRow)) {
+        HashSet<Integer> columns = gameMap.coordinatesClicked.get(tileRow);
+
+        if (!columns.contains(tileCol)) {
+          columns.add(tileCol);
+
+          roomMembers = Room_Members.get(payload.getString("roomId"));
+          TextMessage tileClickedMsg = new TextMessage(payload.toString());
+
+          if (isPlayer1(session, payload.getString("roomId"))) {
+            gameMap.player1Points++;
+            roomMembers.get(1).sendMessage(tileClickedMsg);
+          } else {
+            gameMap.player2Points++;
+            roomMembers.get(0).sendMessage(tileClickedMsg);
+          }
+        }
+      } else {
+        HashSet<Integer> columns = new HashSet<>();
+        columns.add(tileCol);
+        gameMap.coordinatesClicked.put(tileRow, columns);
+
+        roomMembers = Room_Members.get(payload.getString("roomId"));
+        TextMessage tileClickedMsg = new TextMessage(payload.toString());
+
+        if (isPlayer1(session, payload.getString("roomId"))) {
+          gameMap.player1Points++;
+          roomMembers.get(1).sendMessage(tileClickedMsg);
+        } else {
+          gameMap.player2Points++;
+          roomMembers.get(0).sendMessage(tileClickedMsg);
+        }
+      }
+    }
+  }
+
+  private void handleGameOver(JSONObject payload, WebSocketSession session) throws IOException {
+    synchronized (lock) {
+      JSONObject roomInfo = Room_Info.get(payload.getString("roomId"));
+      MultiplayerGameMap gameMap = GameMap_Info.get(payload.get("roomId"));
+
+      boolean playerDied = payload.getBoolean("playerDied");
+
+      if (playerDied) {
+        if (isPlayer1(session, payload.getString("roomId"))) {
+          payload.put("winner", roomInfo.get("player2"));
+        } else {
+          payload.put("winner", roomInfo.get("player1"));
+        }
+      } else {
+        if (gameMap.player1Points > gameMap.player2Points) {
+          payload.put("winner", roomInfo.get("player1"));
+          gameMap.player1Wins++;
+        } else if (gameMap.player1Points < gameMap.player2Points) {
+          payload.put("winner", roomInfo.get("player2"));
+          gameMap.player2Wins++;
+        } else {
+          // It's a tie
+          payload.put("winner", "N/A");
+          gameMap.ties++;
+        }
+      }
+
+      payload.put("player1Points", gameMap.player1Points);
+      payload.put("player2Points", gameMap.player2Points);
+      payload.put("player1Wins", gameMap.player1Wins);
+      payload.put("player2Wins", gameMap.player2Wins);
+      payload.put("ties", gameMap.ties);
+
+      TextMessage gameOverMsg = new TextMessage(payload.toString());
+      ArrayList<WebSocketSession> roomMembers = Room_Members.get(payload.getString("roomId"));
+      roomMembers.get(0).sendMessage(gameOverMsg);
+      roomMembers.get(1).sendMessage(gameOverMsg);
+    }
+  }
+
+  private boolean isPlayer1(WebSocketSession session, String roomId) {
+    ArrayList<WebSocketSession> roomMembers = Room_Members.get(roomId);
+    return session.equals(roomMembers.get(0));
   }
 
   /**
