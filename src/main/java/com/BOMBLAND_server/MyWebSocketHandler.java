@@ -16,7 +16,7 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
   // Set to keep track of connected clients
   private final Set<WebSocketSession> Sessions = Collections.synchronizedSet(new HashSet<>());
   private final HashMap<String, ArrayList<WebSocketSession>> Room_Members = new HashMap<>();
-  private final HashMap<String, JSONObject> Room_Info = new HashMap<>();
+  private final HashMap<String, Room> Room_Info = new HashMap<>();
   private final HashMap<String, MultiplayerGameMap> GameMap_Info = new HashMap<>();
 
   private final Object lock = new Object(); // The lock object
@@ -77,13 +77,18 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
         handleJoinRoom(payload, session);
         break;
 
-      case "UPDATE_READY_STATE_UI", "UPDATE_SETTINGS_UI":
-        System.out.println("UPDATE_READY_STATE_UI || UPDATE_SETTINGS_UI");
+      case "UPDATE_SETTINGS_UI":
+        System.out.println("UPDATE_SETTINGS_UI");
         handleUpdateSettings(payload, session);
         break;
 
       case "LEAVE_ROOM":
         System.out.println("\nLEAVE_ROOM");
+        handleLeaveRoom(payload, session);
+        break;
+
+      case "UPDATE_GAME_READY":
+        System.out.println("\nUPDATE_GAME_READY");
         handleLeaveRoom(payload, session);
         break;
 
@@ -107,6 +112,16 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
       case "GAME_OVER":
         System.out.println("\nGAME_OVER");
         handleGameOver(payload, session);
+        break;
+
+      case "PLAY_AGAIN":
+        System.out.println("\nPLAY_AGAIN");
+        handlePlayAgain(payload, session);
+        break;
+
+      case "LEAVE_GAME":
+        System.out.println("\nLEAVE_GAME");
+        handleLeaveGame(payload, session);
         break;
 
       default:
@@ -145,21 +160,55 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
     broadcastMessage(session, message.getPayload());
   }
 
-  private void handleCreateRoom(JSONObject payload, WebSocketSession session) {
-    payload.remove("message_type");
+  private void handleCreateRoom(JSONObject payload, WebSocketSession session) throws IOException {
+    /**
+     * payload:
+     * - message_type: "CREATE_ROOM"
+     * - id: room id
+     * - name: room name
+     * - player1: player1 name
+     */
 
     ArrayList<WebSocketSession> sessionsList = new ArrayList<>();
     sessionsList.add(session);
-    
     Room_Members.put(payload.getString("id"), sessionsList);
-    Room_Info.put(payload.getString("id"), payload);
+
+    Room newRoom = new Room();
+    newRoom.setId(payload.getString("id"));
+    newRoom.setName(payload.getString("name"));
+    newRoom.setPlayer1Name(payload.getString("player1"));
+    newRoom.player1InRoom(true);
+    Room_Info.put(newRoom.getId(), newRoom);
+
+    JSONObject responseObj = createCopy(newRoom);
+    responseObj.put("message_type", "ROOM_CREATED");
+    TextMessage responseMsg = new TextMessage(responseObj.toString());
+    session.sendMessage(responseMsg);
+  }
+
+  private JSONObject createCopy(Room room) {
+    JSONObject obj = new JSONObject();
+    obj.put("id", room.getId());
+    obj.put("name", room.getName());
+    obj.put("player1Name", room.getPlayer1Name());
+    obj.put("player2Name", room.getPlayer2Name());
+    obj.put("isPlayer1InRoom", room.getPlayer1InRoom());
+    obj.put("isPlayer2InRoom", room.getPlayer2InRoom());
+    return obj;
   }
 
   private void handleCheckRoom(JSONObject payload, WebSocketSession session) throws IOException {
+    /**
+     * payload:
+     * - message_type: "CHECK_ROOM"
+     * - id: room id
+     * - player2: player2 name
+     */
+
     if (Room_Info.get(payload.getString("id")) != null) {
-      payload.put("room_exists", "True");
+      payload.put("room_exists", true);
     } else {
-      payload.put("room_exists", "False");
+      payload.put("room_exists", false);
     }
 
     String responseString = payload.toString();
@@ -167,24 +216,59 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
     session.sendMessage(responseMsg);
   }
 
+
+  // Gets called when:
+  // - A player joins the room for the first time, OR,
+  // - When a player leaves the game map and the other players clicks the OK button on a popup that redirects
+  //   them to the room page
   private void handleJoinRoom(JSONObject payload, WebSocketSession session) throws IOException {
+    /**
+     * payload:
+     * - message_type: "JOIN_ROOM"
+     * - id: room id
+     * - player2: player2 name
+     */
+
     ArrayList<WebSocketSession> sessionsList = Room_Members.get(payload.getString("id"));
-    sessionsList.add(session);
 
-    JSONObject roomInfo = Room_Info.get(payload.getString("id"));
-    roomInfo.put("player2", payload.getString("player2"));
+    if (sessionsList.size() < 2) { // Player 2 joins the room for the first time
+      sessionsList.add(session);
 
-    JSONObject player1responseObj = new JSONObject();
-    player1responseObj.put("message_type", "PLAYER_JOINED_ROOM");
-    player1responseObj.put("player2", payload.getString("player2"));
-    TextMessage player1Msg = new TextMessage(player1responseObj.toString());
+      Room roomInfo = Room_Info.get(payload.getString("id"));
+      roomInfo.setPlayer2Name(payload.getString("player2"));
+      roomInfo.player2InRoom(true);
 
-    JSONObject player2responseObj = new JSONObject(roomInfo, JSONObject.getNames(roomInfo)); // copy-by-value
-    player2responseObj.put("message_type", "JOIN_ROOM");
-    TextMessage player2Msg = new TextMessage(player2responseObj.toString());
+      JSONObject player1responseObj = createCopy(roomInfo);
+      player1responseObj.put("message_type", "PLAYER_JOINED_ROOM");
+      TextMessage player1Msg = new TextMessage(player1responseObj.toString());
 
-    sessionsList.get(0).sendMessage(player1Msg); // sends player1 player2's username
-    sessionsList.get(1).sendMessage(player2Msg); // sends player2 room info
+      JSONObject player2responseObj = createCopy(roomInfo);
+      player2responseObj.put("message_type", "JOIN_ROOM");
+      TextMessage player2Msg = new TextMessage(player2responseObj.toString());
+
+      sessionsList.get(0).sendMessage(player1Msg); // sends player1 the updated room info
+      sessionsList.get(1).sendMessage(player2Msg); // sends player2 the updated room info
+    } else { // Either player 1 or 2 rejoins the room after the other player leaves the game map
+      Room roomInfo = Room_Info.get(payload.getString("id"));
+
+      JSONObject existingPlayerResponseObj = new JSONObject();
+      existingPlayerResponseObj.put("message_type", "PLAYER_JOINED_ROOM");
+      TextMessage existingPlayerMsg = new TextMessage(existingPlayerResponseObj.toString());
+
+      JSONObject playerJoiningResponseObj = new JSONObject(roomInfo, JSONObject.getNames(roomInfo)); // copy-by-value
+      playerJoiningResponseObj.put("message_type", "JOIN_ROOM");
+      TextMessage playerJoiningMsg = new TextMessage(playerJoiningResponseObj.toString());
+
+      if (isPlayer1(session, payload.getString("roomId"))) {
+        // Player 1 rejoining room
+        sessionsList.get(1).sendMessage(existingPlayerMsg);
+        sessionsList.get(0).sendMessage(playerJoiningMsg);
+      } else {
+        // Player 2 rejoining room
+        sessionsList.get(0).sendMessage(existingPlayerMsg);
+        sessionsList.get(1).sendMessage(playerJoiningMsg);
+      }
+    }
   }
 
   private void handleUpdateSettings(JSONObject payload, WebSocketSession session) throws IOException {
@@ -200,7 +284,7 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
 
   private void handleLeaveRoom(JSONObject payload, WebSocketSession session) throws IOException {
     if (Room_Info.get(payload.get("roomId")) != null) {
-      JSONObject roomInfo = Room_Info.get(payload.get("roomId"));
+      Room roomInfo = Room_Info.get(payload.get("roomId"));
       ArrayList<WebSocketSession> roomMembers = Room_Members.get(payload.get("roomId"));
 
       // Player1 is leaving the room
@@ -215,24 +299,45 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
       } else { // Player2 is leaving the room
         TextMessage leaveRoomMsg = new TextMessage(payload.toString());
         roomMembers.get(0).sendMessage(leaveRoomMsg);
-
         roomMembers.remove(1);
-        roomInfo.remove("player2");
+        roomInfo.setPlayer2Name("N/A");
       }
     }
   }
 
   private void handleJoinGameMap(JSONObject payload, WebSocketSession session) throws IOException {
-    GameMap_Info.put(payload.get("roomId").toString(), new MultiplayerGameMap());
+    /**
+     * payload:
+     * - message_type: "JOIN_GAME_MAP"
+     * - roomId: room id
+     * - map: map name
+     * - difficulty: difficulty name
+     */
 
-    ArrayList<WebSocketSession> roomMembers = Room_Members.get(payload.get("roomId"));
+    Room room = Room_Info.get(payload.getString("roomId"));
+    room.player1InRoom(false);
+    room.player2InRoom(false);
+
+    GameMap_Info.put(payload.getString("roomId"), new MultiplayerGameMap());
+
+    ArrayList<WebSocketSession> roomMembers = Room_Members.get(payload.getString("roomId"));
     TextMessage gameSettingsMsg = new TextMessage(payload.toString());
     roomMembers.get(1).sendMessage(gameSettingsMsg);
   }
 
   private void handleFirstTileClick(JSONObject payload, WebSocketSession session) throws IOException {
+    /**
+     * payload:
+     * - message_type: "FIRST_TILE_CLICK"
+     * - roomId: room id
+     * - playerName: player name
+     * - row: row number of tile clicked
+     * - col: col number of tile clicked
+     * - bombCoordinates: row & col of each bomb tile
+     */
+
     synchronized (lock) {
-      MultiplayerGameMap gameMap = GameMap_Info.get(payload.get("roomId"));
+      MultiplayerGameMap gameMap = GameMap_Info.get(payload.getString("roomId"));
 
       if (!gameMap.gameStarted) {
         gameMap.gameStarted = true;
@@ -246,13 +351,16 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
 
         if (isPlayer1(session, payload.getString("roomId"))) {
           gameMap.player1Points++;
+          payload.put("player1Points", gameMap.player1Points);
+          System.out.println("XXX - row = " + tileRow + ", col = " + tileCol + ", playerName = " + payload.get("playerName"));
         } else {
           gameMap.player2Points++;
+          payload.put("player2Points", gameMap.player2Points);
+          System.out.println("OOO - row = " + tileRow + ", col = " + tileCol + ", playerName = " + payload.get("playerName"));
         }
 
-        ArrayList<WebSocketSession> roomMembers = Room_Members.get(payload.get("roomId"));
+        ArrayList<WebSocketSession> roomMembers = Room_Members.get(payload.getString("roomId"));
         TextMessage initialGameMsg = new TextMessage(payload.toString());
-
         roomMembers.get(0).sendMessage(initialGameMsg);
         roomMembers.get(1).sendMessage(initialGameMsg);
       }
@@ -265,7 +373,7 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
       int tileCol = payload.getInt("col");
 
       MultiplayerGameMap gameMap = GameMap_Info.get(payload.get("roomId"));
-      ArrayList<WebSocketSession> roomMembers = null;
+      ArrayList<WebSocketSession> roomMembers = Room_Members.get(payload.getString("roomId"));
 
       if (gameMap.coordinatesClicked.containsKey(tileRow)) {
         HashSet<Integer> columns = gameMap.coordinatesClicked.get(tileRow);
@@ -273,55 +381,65 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
         if (!columns.contains(tileCol)) {
           columns.add(tileCol);
 
-          roomMembers = Room_Members.get(payload.getString("roomId"));
-          TextMessage tileClickedMsg = new TextMessage(payload.toString());
-
           if (isPlayer1(session, payload.getString("roomId"))) {
             gameMap.player1Points++;
-            roomMembers.get(1).sendMessage(tileClickedMsg);
+            payload.put("player1Points", gameMap.player1Points);
           } else {
             gameMap.player2Points++;
-            roomMembers.get(0).sendMessage(tileClickedMsg);
+            payload.put("player2Points", gameMap.player2Points);
           }
+
+          TextMessage tileClickedMsg = new TextMessage(payload.toString());
+          roomMembers.get(0).sendMessage(tileClickedMsg);
+          roomMembers.get(1).sendMessage(tileClickedMsg);
         }
       } else {
         HashSet<Integer> columns = new HashSet<>();
         columns.add(tileCol);
         gameMap.coordinatesClicked.put(tileRow, columns);
 
-        roomMembers = Room_Members.get(payload.getString("roomId"));
-        TextMessage tileClickedMsg = new TextMessage(payload.toString());
-
         if (isPlayer1(session, payload.getString("roomId"))) {
           gameMap.player1Points++;
-          roomMembers.get(1).sendMessage(tileClickedMsg);
+          payload.put("player1Points", gameMap.player1Points);
+          System.out.println("XXX - row = " + tileRow + ", col = " + tileCol + ", playerName = " + payload.get("playerName"));
         } else {
           gameMap.player2Points++;
-          roomMembers.get(0).sendMessage(tileClickedMsg);
+          payload.put("player2Points", gameMap.player2Points);
+          System.out.println("OOO - row = " + tileRow + ", col = " + tileCol + ", playerName = " + payload.get("playerName"));
         }
+
+        TextMessage tileClickedMsg = new TextMessage(payload.toString());
+        roomMembers.get(0).sendMessage(tileClickedMsg);
+        roomMembers.get(1).sendMessage(tileClickedMsg);
       }
     }
   }
 
   private void handleGameOver(JSONObject payload, WebSocketSession session) throws IOException {
     synchronized (lock) {
-      JSONObject roomInfo = Room_Info.get(payload.getString("roomId"));
+      Room roomInfo = Room_Info.get(payload.getString("roomId"));
       MultiplayerGameMap gameMap = GameMap_Info.get(payload.get("roomId"));
+
+      if (gameMap.roundProcessed) {
+        return;
+      }
 
       boolean playerDied = payload.getBoolean("playerDied");
 
       if (playerDied) {
         if (isPlayer1(session, payload.getString("roomId"))) {
-          payload.put("winner", roomInfo.get("player2"));
+          payload.put("winner", roomInfo.getPlayer2Name());
+          gameMap.player2Wins++;
         } else {
-          payload.put("winner", roomInfo.get("player1"));
+          payload.put("winner", roomInfo.getPlayer1Name());
+          gameMap.player1Wins++;
         }
       } else {
         if (gameMap.player1Points > gameMap.player2Points) {
-          payload.put("winner", roomInfo.get("player1"));
+          payload.put("winner", roomInfo.getPlayer1Name());
           gameMap.player1Wins++;
         } else if (gameMap.player1Points < gameMap.player2Points) {
-          payload.put("winner", roomInfo.get("player2"));
+          payload.put("winner", roomInfo.getPlayer2Name());
           gameMap.player2Wins++;
         } else {
           // It's a tie
@@ -334,13 +452,86 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
       payload.put("player2Points", gameMap.player2Points);
       payload.put("player1Wins", gameMap.player1Wins);
       payload.put("player2Wins", gameMap.player2Wins);
+      payload.put("player1Name", roomInfo.getPlayer1Name());
+      payload.put("player2Name", roomInfo.getPlayer2Name());
       payload.put("ties", gameMap.ties);
+      payload.put("round", gameMap.round);
 
       TextMessage gameOverMsg = new TextMessage(payload.toString());
       ArrayList<WebSocketSession> roomMembers = Room_Members.get(payload.getString("roomId"));
       roomMembers.get(0).sendMessage(gameOverMsg);
       roomMembers.get(1).sendMessage(gameOverMsg);
+
+      gameMap.roundProcessed = true;
     }
+  }
+
+  private void handlePlayAgain(JSONObject payload, WebSocketSession session) throws IOException {
+    MultiplayerGameMap gameMap = GameMap_Info.get(payload.getString("roomId"));
+
+    synchronized (lock) {
+      if (isPlayer1(session, payload.getString("roomId"))) {
+        gameMap.player1WantsToPlayAgain = true;
+      } else {
+        gameMap.player2WantsToPlayAgain = true;
+      }
+
+      ArrayList<WebSocketSession> roomMembers = Room_Members.get(payload.getString("roomId"));
+
+      if (gameMap.player1WantsToPlayAgain && gameMap.player2WantsToPlayAgain) {
+        gameMap.gameStarted = false;
+        gameMap.coordinatesClicked = new HashMap<>();
+        gameMap.player1Points = 0;
+        gameMap.player2Points = 0;
+        gameMap.round++;
+        gameMap.roundProcessed = false;
+        gameMap.player1WantsToPlayAgain = false;
+        gameMap.player2WantsToPlayAgain = false;
+
+        payload.put("player1Ready", true);
+        payload.put("player2Ready", true);
+
+        TextMessage playAgainMsg = new TextMessage(payload.toString());
+        roomMembers.get(0).sendMessage(playAgainMsg);
+        roomMembers.get(1).sendMessage(playAgainMsg);
+      } else {
+        if (gameMap.player1WantsToPlayAgain) {
+          payload.put("player1Ready", "yes");
+          TextMessage playAgainMsg = new TextMessage(payload.toString());
+          roomMembers.get(1).sendMessage(playAgainMsg);
+        } else {
+          payload.put("player2Ready", "yes");
+          TextMessage playAgainMsg = new TextMessage(payload.toString());
+          roomMembers.get(0).sendMessage(playAgainMsg);
+        }
+      }
+    }
+  }
+
+  private void handleLeaveGame(JSONObject payload, WebSocketSession session) throws IOException {
+    /**
+     * payload:
+     * - message_type: "LEAVE_GAME"
+     * - roomId: room id
+     * - playerName: player name
+     */
+
+    Room roomInfo = Room_Info.get(payload.getString("roomId"));
+
+    if (isPlayer1(session, payload.getString("roomId"))) {
+      roomInfo.player1InRoom(true);
+    } else {
+      roomInfo.player2InRoom(true);
+    }
+
+    JSONObject responseObj = createCopy(roomInfo);
+    responseObj.put("message_type", "LEAVE_GAME");
+    responseObj.put("playerName", payload.getString("playerName"));
+    TextMessage textMsg = new TextMessage(responseObj.toString());
+
+    ArrayList<WebSocketSession> sessionsList = Room_Members.get(payload.getString("roomId"));
+    sessionsList.get(0).sendMessage(textMsg);
+    sessionsList.get(1).sendMessage(textMsg);
   }
 
   private boolean isPlayer1(WebSocketSession session, String roomId) {
