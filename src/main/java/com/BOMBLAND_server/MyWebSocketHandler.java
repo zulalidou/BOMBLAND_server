@@ -12,6 +12,9 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+/**
+ * This class sets up different routes for the server.
+ */
 public class MyWebSocketHandler extends TextWebSocketHandler {
   // Set to keep track of connected clients
   private final Set<WebSocketSession> Sessions = Collections.synchronizedSet(new HashSet<>());
@@ -339,23 +342,23 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
     synchronized (lock) {
       MultiplayerGameMap gameMap = GameMap_Info.get(payload.getString("roomId"));
 
-      if (!gameMap.gameStarted) {
-        gameMap.gameStarted = true;
+      if (!gameMap.getGameStarted()) {
+        gameMap.setGameStarted(true);
 
         int tileRow = payload.getInt("row");
         int tileCol = payload.getInt("col");
 
         HashSet<Integer> columns = new HashSet<>();
         columns.add(tileCol);
-        gameMap.coordinatesClicked.put(tileRow, columns);
+        gameMap.getCoordinatesClicked().put(tileRow, columns);
 
         if (isPlayer1(session, payload.getString("roomId"))) {
-          gameMap.player1Points++;
-          payload.put("player1Points", gameMap.player1Points);
+          gameMap.incrementPlayer1Points();
+          payload.put("player1Points", gameMap.getPlayer1Points());
           System.out.println("XXX - row = " + tileRow + ", col = " + tileCol + ", playerName = " + payload.get("playerName"));
         } else {
-          gameMap.player2Points++;
-          payload.put("player2Points", gameMap.player2Points);
+          gameMap.incrementPlayer2Points();
+          payload.put("player2Points", gameMap.getPlayer2Points());
           System.out.println("OOO - row = " + tileRow + ", col = " + tileCol + ", playerName = " + payload.get("playerName"));
         }
 
@@ -375,18 +378,18 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
       MultiplayerGameMap gameMap = GameMap_Info.get(payload.get("roomId"));
       ArrayList<WebSocketSession> roomMembers = Room_Members.get(payload.getString("roomId"));
 
-      if (gameMap.coordinatesClicked.containsKey(tileRow)) {
-        HashSet<Integer> columns = gameMap.coordinatesClicked.get(tileRow);
+      if (gameMap.getCoordinatesClicked().containsKey(tileRow)) {
+        HashSet<Integer> columns = gameMap.getCoordinatesClicked().get(tileRow);
 
         if (!columns.contains(tileCol)) {
           columns.add(tileCol);
 
           if (isPlayer1(session, payload.getString("roomId"))) {
-            gameMap.player1Points++;
-            payload.put("player1Points", gameMap.player1Points);
+            gameMap.incrementPlayer1Points();
+            payload.put("player1Points", gameMap.getPlayer1Points());
           } else {
-            gameMap.player2Points++;
-            payload.put("player2Points", gameMap.player2Points);
+            gameMap.incrementPlayer2Points();
+            payload.put("player2Points", gameMap.getPlayer2Points());
           }
 
           TextMessage tileClickedMsg = new TextMessage(payload.toString());
@@ -396,15 +399,15 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
       } else {
         HashSet<Integer> columns = new HashSet<>();
         columns.add(tileCol);
-        gameMap.coordinatesClicked.put(tileRow, columns);
+        gameMap.getCoordinatesClicked().put(tileRow, columns);
 
         if (isPlayer1(session, payload.getString("roomId"))) {
-          gameMap.player1Points++;
-          payload.put("player1Points", gameMap.player1Points);
+          gameMap.incrementPlayer1Points();
+          payload.put("player1Points", gameMap.getPlayer1Points());
           System.out.println("XXX - row = " + tileRow + ", col = " + tileCol + ", playerName = " + payload.get("playerName"));
         } else {
-          gameMap.player2Points++;
-          payload.put("player2Points", gameMap.player2Points);
+          gameMap.incrementPlayer2Points();
+          payload.put("player2Points", gameMap.getPlayer2Points());
           System.out.println("OOO - row = " + tileRow + ", col = " + tileCol + ", playerName = " + payload.get("playerName"));
         }
 
@@ -420,7 +423,7 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
       Room roomInfo = Room_Info.get(payload.getString("roomId"));
       MultiplayerGameMap gameMap = GameMap_Info.get(payload.get("roomId"));
 
-      if (gameMap.roundProcessed) {
+      if (gameMap.getCurrentRoundProcessed()) {
         return;
       }
 
@@ -429,40 +432,40 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
       if (playerDied) {
         if (isPlayer1(session, payload.getString("roomId"))) {
           payload.put("winner", roomInfo.getPlayer2Name());
-          gameMap.player2Wins++;
+          gameMap.incrementPlayer2Wins();
         } else {
           payload.put("winner", roomInfo.getPlayer1Name());
-          gameMap.player1Wins++;
+          gameMap.incrementPlayer1Wins();
         }
       } else {
-        if (gameMap.player1Points > gameMap.player2Points) {
+        if (gameMap.getPlayer1Points() > gameMap.getPlayer2Points()) {
           payload.put("winner", roomInfo.getPlayer1Name());
-          gameMap.player1Wins++;
-        } else if (gameMap.player1Points < gameMap.player2Points) {
+          gameMap.incrementPlayer1Wins();
+        } else if (gameMap.getPlayer1Points() < gameMap.getPlayer2Points()) {
           payload.put("winner", roomInfo.getPlayer2Name());
-          gameMap.player2Wins++;
+          gameMap.incrementPlayer2Wins();
         } else {
           // It's a tie
           payload.put("winner", "N/A");
-          gameMap.ties++;
+          gameMap.incrementTies();
         }
       }
 
-      payload.put("player1Points", gameMap.player1Points);
-      payload.put("player2Points", gameMap.player2Points);
-      payload.put("player1Wins", gameMap.player1Wins);
-      payload.put("player2Wins", gameMap.player2Wins);
+      payload.put("player1Points", gameMap.getPlayer1Points());
+      payload.put("player2Points", gameMap.getPlayer2Points());
+      payload.put("player1Wins", gameMap.getPlayer1Wins());
+      payload.put("player2Wins", gameMap.getPlayer2Wins());
       payload.put("player1Name", roomInfo.getPlayer1Name());
       payload.put("player2Name", roomInfo.getPlayer2Name());
-      payload.put("ties", gameMap.ties);
-      payload.put("round", gameMap.round);
+      payload.put("ties", gameMap.getTies());
+      payload.put("round", gameMap.getCurrentRound());
 
       TextMessage gameOverMsg = new TextMessage(payload.toString());
       ArrayList<WebSocketSession> roomMembers = Room_Members.get(payload.getString("roomId"));
       roomMembers.get(0).sendMessage(gameOverMsg);
       roomMembers.get(1).sendMessage(gameOverMsg);
 
-      gameMap.roundProcessed = true;
+      gameMap.setCurrentRoundProcessed(true);
     }
   }
 
@@ -471,22 +474,22 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
 
     synchronized (lock) {
       if (isPlayer1(session, payload.getString("roomId"))) {
-        gameMap.player1WantsToPlayAgain = true;
+        gameMap.setPlayer1WantsToPlayAgain(true);
       } else {
-        gameMap.player2WantsToPlayAgain = true;
+        gameMap.setPlayer2WantsToPlayAgain(true);
       }
 
       ArrayList<WebSocketSession> roomMembers = Room_Members.get(payload.getString("roomId"));
 
-      if (gameMap.player1WantsToPlayAgain && gameMap.player2WantsToPlayAgain) {
-        gameMap.gameStarted = false;
-        gameMap.coordinatesClicked = new HashMap<>();
-        gameMap.player1Points = 0;
-        gameMap.player2Points = 0;
-        gameMap.round++;
-        gameMap.roundProcessed = false;
-        gameMap.player1WantsToPlayAgain = false;
-        gameMap.player2WantsToPlayAgain = false;
+      if (gameMap.getPlayer1WantsToPlayAgain() && gameMap.getPlayer2WantsToPlayAgain()) {
+        gameMap.setGameStarted(false);
+        gameMap.setCoordinatesClicked(new HashMap<>());
+        gameMap.resetPlayer1Points();
+        gameMap.resetPlayer2Points();
+        gameMap.incrementCurrentRound();
+        gameMap.setCurrentRoundProcessed(false);
+        gameMap.setPlayer1WantsToPlayAgain(false);
+        gameMap.setPlayer2WantsToPlayAgain(false);
 
         payload.put("player1Ready", true);
         payload.put("player2Ready", true);
@@ -495,7 +498,7 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
         roomMembers.get(0).sendMessage(playAgainMsg);
         roomMembers.get(1).sendMessage(playAgainMsg);
       } else {
-        if (gameMap.player1WantsToPlayAgain) {
+        if (gameMap.getPlayer1WantsToPlayAgain()) {
           payload.put("player1Ready", "yes");
           TextMessage playAgainMsg = new TextMessage(payload.toString());
           roomMembers.get(1).sendMessage(playAgainMsg);

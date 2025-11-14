@@ -1,5 +1,8 @@
 package com.BOMBLAND_server;
 
+/**
+ * This class keeps track of the state of each multiplayer room.
+ */
 public class Room {
   String id;
   String name;
