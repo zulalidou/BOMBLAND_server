@@ -3,8 +3,9 @@ package com.BOMBLAND_server;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import org.json.JSONObject;
 import org.springframework.web.socket.CloseStatus;
@@ -216,6 +217,10 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
    * @return A JSONObject copy of the Room object provided.
    */
   private JSONObject createCopy(Room room) {
+    if (room == null) {
+      return new JSONObject();
+    }
+
     JSONObject obj = new JSONObject();
     obj.put("id", room.getId());
     obj.put("name", room.getName());
@@ -657,9 +662,51 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
    * @param status An object that provides details about why the connection was closed.
    */
   @Override
-  public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+  public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws IOException {
     System.out.println("\n== afterConnectionClosed() ==");
     System.out.println("Connection closed: " + session.getId());
-    Sessions.remove(session);
+
+    synchronized (lock) {
+      for (Map.Entry<String, ArrayList<WebSocketSession>> entry : Room_Members.entrySet()) {
+        ArrayList<WebSocketSession> sessionList = entry.getValue();
+
+        // the player that disconnected is a member of a multiplayer room
+        if (sessionList.contains(session)) {
+          String roomId = entry.getKey();
+          boolean isPlayer1 = isPlayer1(session, roomId);
+
+          // player1 disconnected
+          if (isPlayer1) {
+            Room_Info.remove(roomId);
+            Room_Members.remove(roomId);
+          } else {
+            Room room = Room_Info.get(roomId);
+            room.setPlayer2Name("N/A");
+            room.player2InRoom(false);
+            room.player1InRoom(true);
+
+            sessionList.remove(1);
+          }
+
+          GameMap_Info.remove(roomId);
+
+          JSONObject jsonObjectMsg = createCopy(Room_Info.get(roomId));
+          jsonObjectMsg.put("message_type", "SERVER_CONNECTION_CLOSED");
+          jsonObjectMsg.put("roomStillExists", Room_Info.get(roomId) != null);
+
+          TextMessage textMsg = new TextMessage(jsonObjectMsg.toString());
+
+          if (isPlayer1) {
+            sessionList.get(1).sendMessage(textMsg);
+          } else {
+            sessionList.get(0).sendMessage(textMsg);
+          }
+
+          break;
+        }
+      }
+
+      Sessions.remove(session);
+    }
   }
 }
