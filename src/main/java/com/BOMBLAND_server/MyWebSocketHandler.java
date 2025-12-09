@@ -299,8 +299,11 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
    */
   private void handleUpdateSettings(JSONObject payload) throws IOException {
     ArrayList<WebSocketSession> roomMembers = Room_Members.get(payload.getString("roomId"));
-    TextMessage payloadMsg = new TextMessage(payload.toString());
-    roomMembers.get(1).sendMessage(payloadMsg);
+
+    if (roomMembers.size() == 2) {
+      TextMessage payloadMsg = new TextMessage(payload.toString());
+      roomMembers.get(1).sendMessage(payloadMsg);
+    }
   }
 
   /**
